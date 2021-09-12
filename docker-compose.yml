@@ -7,6 +7,7 @@ services:
       - "8000:80"
     volumes:
       - ".:/app:rw"
+      - "./data:/data:rw"
     command: python manage.py runserver 0.0.0.0:80
     links:
       - "database_default"

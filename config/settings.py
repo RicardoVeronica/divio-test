@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from django_storage_url import dsn_configured_storage_class
 import os
 import dj_database_url
 
@@ -39,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'uploader',
 ]
 
 MIDDLEWARE = [
@@ -119,3 +122,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media files
+# DEFAULT_FILE_STORAGE is configured using DEFAULT_STORAGE_DSN
+
+# read the setting value from the environment variable
+DEFAULT_STORAGE_DSN = os.environ.get('DEFAULT_STORAGE_DSN')
+
+# dsn_configured_storage_class() requires the name of the setting
+DefaultStorageClass = dsn_configured_storage_class('DEFAULT_STORAGE_DSN')
+
+# Django's DEFAULT_FILE_STORAGE requires the class name
+DEFAULT_FILE_STORAGE = 'config.settings.DefaultStorageClass'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join('/data/media/')
