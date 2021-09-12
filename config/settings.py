@@ -23,12 +23,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')o+ia((+r(-kb5=!p!&7e^)6wb8vkxt9qb%-mohogyhx3u66$m'
+SECRET_KEY = os.environ.get(
+        'SECRET_KEY', ')o+ia((+r(-kb5=!p!&7e^)6wb8vkxt9qb%-mohogyhx3u66$m'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG') == "True"
 
-ALLOWED_HOSTS = ['*']
+DIVIO_DOMAIN = os.environ.get('DOMAIN', '')
+
+DIVIO_DOMAIN_ALIASES = [
+    d.strip()
+    for d in os.environ.get('DOMAIN_ALIASES', '').split(',')
+    if d.strip()
+]
+
+DIVIO_DOMAIN_REDIRECTS = [
+    d.strip()
+    for d in os.environ.get('DOMAIN_REDIRECTS', '').split(',')
+    if d.strip()
+]
+
+ALLOWED_HOSTS = [DIVIO_DOMAIN] + DIVIO_DOMAIN_ALIASES + DIVIO_DOMAIN_REDIRECTS
 
 
 # Application definition
@@ -79,7 +95,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite://:memory:')
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
 
 
@@ -137,3 +153,6 @@ DEFAULT_FILE_STORAGE = 'config.settings.DefaultStorageClass'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join('/data/media/')
+
+# Redirect to HTTPS by default, unless explicitly disabled
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT') != "False"
